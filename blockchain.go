@@ -6,7 +6,6 @@ import (
 	"fmt"
   "io/ioutil"
   "encoding/json"
-  "time"
 )
 var client = &http.Client{}
 var chaincodeID = "mycc"
@@ -53,12 +52,12 @@ func postData(url, s string) ([]byte, error) {
 
 func registrar() error {
   url := "http://" + config.peerAddress + "/registrar";
-  s := "{\"enrollId\":\"" + config.enrollId + "\",\"enrollSecret\":\"" + config.enrollSecret + "\"}";
+  s := "{\"enrollId\":\"" + curator.EnrollID + "\",\"enrollSecret\":\"" + curator.EnrollSecret + "\"}";
   _, err := postData(url, s);
   return err;
 }
 
-func deploy() error {
+func getChaincodeID() error {
   url := "http://" + config.peerAddress + "/chaincode";
   template :=
   `
@@ -78,7 +77,7 @@ func deploy() error {
     "id": 1
   }
   `
-  s := fmt.Sprintf(template, config.chaincodePath, config.enrollId)
+  s := fmt.Sprintf(template, config.chaincodePath, curator.EnrollID)
   body, err := postData(url, s);
   if err != nil {
     return err;
@@ -92,7 +91,7 @@ func deploy() error {
     return ErrBlockChain(resp.Error.Data);
   }
 
-  chaincodeID = resp.Result.Message;
+  curator.ChaincodeID = resp.Result.Message;
   return nil
 }
 
@@ -119,13 +118,13 @@ func addAsset(cdId string) error  {
     "id": 2
   }
   `
-  s := fmt.Sprintf(template, chaincodeID, cdId, config.enrollId, config.enrollId)
+  s := fmt.Sprintf(template, curator.ChaincodeID, cdId, curator.EnrollID, curator.EnrollID)
   var err error;
   _, err = postData(url, s);
   if (err != nil) {
     return err;
   }
-  time.Sleep(5000 * time.Millisecond)
+  // time.Sleep(5000 * time.Millisecond)
   err = queryAsset(cdId);
   return err;
 }
@@ -151,7 +150,7 @@ func queryAsset(cdId string) error {
     },
     "id": 2
   }`
-  s := fmt.Sprintf(template, chaincodeID, cdId, config.enrollId)
+  s := fmt.Sprintf(template, curator.ChaincodeID, cdId, curator.EnrollID)
   body, err := postData(url, s);
   if err != nil {
     return err;

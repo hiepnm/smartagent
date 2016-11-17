@@ -15,7 +15,7 @@ func init() {
       Key: "09876543211234567890098765432112",
       Name: "Fast and Furious",
       Info: "This is a compact disc infomation",
-      CDId: "ID_Fast_and_Furious",
+      CDId: "1",
     })
     RepoCreateDisc(Disc{
       KeyId: "ID_Romeo_and_Juliet",
